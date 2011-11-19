@@ -1,0 +1,11 @@
+[Gedit Plugin]
+Loader=python
+Module=gtagJump
+IAge=2
+Name=GtagJump
+Name[ja]=GtagJump
+Description=jump the symbol using gtags
+Description[ja]=gtagsで飛びます
+Authors=Tsushima Masatoshi <utisam@gmail.com>
+Copyright=Copyright © 2011- Masatoshi Tsushima <utisam@gmail.com>
+Website=http://twitter.com/#!/utisam
