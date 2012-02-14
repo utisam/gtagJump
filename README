@@ -2,7 +2,7 @@ gtagsで飛ぶ gtagJump
 	--- Fly with the gtags "tagJump" ---
 
 	使い方(How to use)
-		gfly.pluginとgflyフォルダを~/.gnome2/gedit/pluginsにコピー
+		gfly.pluginとgflyフォルダを~/.local/share/gedit/plugins/にコピー
 		copy "gtagJump.plugin" and "gtagJump/" to ~/.local/share/gedit/plugins/
 		
 			~(home)/
