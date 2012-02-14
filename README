@@ -1,17 +1,17 @@
 gtagsで飛ぶ gtagJump
 	--- Fly with the gtags "tagJump" ---
-	ver 0.1
 
 	使い方(How to use)
-		gtagJump.gedit-pluginとgtagJumpフォルダを~/.gnome2/gedit/pluginsにコピー
-		copy "gtagJump.gedit-plugin" and "gtagJump/" to ~/gnome2/gedit/plugins
+		gfly.pluginとgflyフォルダを~/.gnome2/gedit/pluginsにコピー
+		copy "gtagJump.plugin" and "gtagJump/" to ~/.local/share/gedit/plugins/
 		
 			~(home)/
-				.gnome2/
-					gedit/
-						plugins/
-							gtagJump.gedit-plugin
-							gtagJump/
+				.local/
+					share/
+						gedit/
+							plugins/
+								gtagJump.plugin
+								gtagJump/
 		
 		編集→設定→プラグインでgflyを有効にする
 		"edit"->"Preference"->"Plugins" and check "gtagJump"
@@ -41,6 +41,11 @@ gtagsで飛ぶ gtagJump
 		The dialog when there are multiple choices
 		上下で選択してEnterキーを押してください．
 		Use up and down key to select and push the Enter key
+		
+		Pythonを書いているのであれば，
+		gtagsなしでも編集中のファイルの関数やクラスの定義へ飛ぶことができます
+		writing Python, you can jump to definitions of functions and classes
+		in the editing file without gtags.
 		
 	注意(Notes)
 		

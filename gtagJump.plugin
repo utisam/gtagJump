@@ -1,7 +1,7 @@
-[Gedit Plugin]
+[Plugin]
 Loader=python
 Module=gtagJump
-IAge=2
+IAge=3
 Name=GtagJump
 Name[ja]=GtagJump
 Description=jump the symbol using gtags
