@@ -66,10 +66,22 @@ class GtagJump(GObject.Object, Gedit.WindowActivatable):
 		print identifier
 		defs = []
 		for navi in settings.navigator:
-			defs = defs + [d for d in navi.getDefinitions(doc, identifier)]
+			try:
+				defs = defs + [d for d in navi.getDefinitions(doc, identifier)]
+			except TypeError:
+				continue
 		self.jump(defs, identifier)
 	def __jump_ref(self, action):
-		pass
+		doc = self.window.get_active_document()
+		identifier = getCurrentIdentifier(doc)
+		print identifier
+		refs = []
+		for navi in settings.navigator:
+			try:
+				refs = refs + [d for d in navi.getReferences(doc, identifier)]
+			except TypeError:
+				continue
+		self.jump(refs, identifier)
 	def jump(self, locations, identifier):
 		if len(locations) != 0:
 			if len(locations) == 1:

@@ -15,5 +15,5 @@ class PythonNavigator:
 				yield c.get_lineno()
 			for l in self.generateDefLines(c, identifier):
 				yield l
-	def getReference(self, doc, identifier):
+	def getReferences(self, doc, identifier):
 		pass

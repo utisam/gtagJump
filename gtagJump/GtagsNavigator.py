@@ -13,7 +13,7 @@ class GtagsNavigator:
 		finally:
 			if not ps_global is None:
 				ps_global.stdout.close()
-	def getReference(self, doc, identifier):
+	def getReferences(self, doc, identifier):
 		try:
 			ps_global = subprocess.Popen(["global", "-rx"] + [identifier], stdout=subprocess.PIPE)
 			for pathline in self.parse(ps_global, identifier):
