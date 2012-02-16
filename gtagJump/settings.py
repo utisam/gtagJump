@@ -10,3 +10,7 @@ navigator = [
 
 keyJumpDef = "F3"
 keyJumpRef = "<Control>F3"
+keyJumpBack = "<Alt>b"
+keyJumpNext = "<Alt>n"
+
+historymax = 100
