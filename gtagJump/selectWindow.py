@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 import sys
-from gi.repository import Gtk, Gio
+from gi.repository import Gtk, Gio, Gdk
 
 
 class TreeViewWithColumn(Gtk.TreeView):
@@ -32,6 +32,7 @@ class SelectWindow(Gtk.Window):
         )  # file, line, line_str
         self.treeview.set_rules_hint(True)
         self.connect("key-press-event", self.__enter)
+        self.connect("button-press-event", self.__enter)
         sw = Gtk.ScrolledWindow()
         sw.add(self.treeview)
         for rec in recodes:
@@ -42,7 +43,14 @@ class SelectWindow(Gtk.Window):
         self.set_size_request(700, 360)
 
     def __enter(self, w, e):
-        if e.keyval == 65293:
+        event_type = e.get_event_type()
+        if (
+            event_type == Gdk.EventType._2BUTTON_PRESS
+            or (
+                event_type == Gdk.EventType.KEY_PRESS
+                and e.keyval == 65293
+            )
+        ):
             model, iter = self.treeview.get_selection().get_selected()
             path, line, line_str = model.get(
                 iter,
