@@ -1,40 +1,29 @@
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 
 import subprocess
 import re
+
+
 class GtagsNavigator:
-	def getDefinitions(self, doc, identifier):
-		try:
-			ps_global = subprocess.Popen(["global", "-x"] + [identifier], stdout=subprocess.PIPE)
-			for pathline in self.parse(ps_global, identifier):
-				yield pathline
-		except OSError:
-			pass
-		finally:
-			if not ps_global is None:
-				ps_global.stdout.close()
-	def getReferences(self, doc, identifier):
-		try:
-			ps_global = subprocess.Popen(["global", "-rx"] + [identifier], stdout=subprocess.PIPE)
-			for pathline in self.parse(ps_global, identifier):
-				yield pathline
-		except OSError:
-			pass
-		finally:
-			if not ps_global is None:
-				ps_global.stdout.close()
-	def parse(self, ps_global, identifier):
-		for line in ps_global.stdout:
-			pathline = self.resultLineToLocation(identifier, line)
-			if not pathline is None:
-				yield pathline
-	def resultLineToLocation(self, identifier, line):
-		matchObj = re.search("^" + identifier + " +[0-9]+", line)
-		if matchObj is None:
-			return None
-		l = int(matchObj.group(0)[len(identifier):])
-		matchObj = re.search("^ *[^ ]+ *", line[matchObj.end():])
-		if matchObj is None:
-			return None
-		path = matchObj.group(0).strip()
-		return path, l, ""
+    def _call_global(self, doc, identifier, param):
+        try:
+            text = subprocess.check_output(
+                ["/usr/bin/global", "--encode-path", " ", param, identifier]
+            ).decode('utf8')
+
+            for line in text.split('\n'):
+                matchObj = re.search(
+                    "^" + identifier + " +([0-9]+) +([^ ]+) +(.*)",
+                    line
+                )
+                if matchObj:
+                    lineno, path, code = matchObj.groups()
+                    yield path.replace('%20', ' '), int(lineno), code
+        except OSError:
+            pass
+
+    def getDefinitions(self, doc, identifier):
+        yield from self._call_global(doc, identifier, '-x')
+
+    def getReferences(self, doc, identifier):
+        yield from self._call_global(doc, identifier, '-rx')
