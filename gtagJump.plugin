@@ -1,11 +1,11 @@
 [Plugin]
-Loader=python
+Loader=python3
 Module=gtagJump
 IAge=3
 Name=GtagJump
 Name[ja]=GtagJump
 Description=jump the symbol using gtags
 Description[ja]=gtagsで飛びます
-Authors=Tsushima Masatoshi <utisam@gmail.com>
-Copyright=Copyright © 2011- Masatoshi Tsushima <utisam@gmail.com>
+Authors=Tsushima Masatoshi <utisam@gmail.com>, ported to 3.14 by Jacek Pliszka <Jacek.Pliszka@gmail.com>
+Copyright=Copyright © 2011- Masatoshi Tsushima <utisam@gmail.com>, license GPL
 Website=http://twitter.com/#!/utisam
