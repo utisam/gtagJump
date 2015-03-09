@@ -71,8 +71,8 @@ class MockPlugin:
 
 def main():
     window = SelectWindow(MockPlugin(), "test", [
-        (10, "testfile.py", "def testfunc():"),
-        (10, "testfile.py", "def testfunc():"),
+        ("testfile.py", 10, "def testfunc():"),
+        ("testfile.py", 10, "def testfunc():"),
     ])
     window.show_all()
     Gtk.main()
