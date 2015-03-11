@@ -7,14 +7,15 @@ class PythonNavigator:
     def getDefinitions(self, doc, identifier):
         if doc.get_language().get_name() != "Python":
             return
-        with open(doc.get_location().get_path()) as f:
+        doc_location = doc.get_location()
+        with open(doc_location.get_path()) as f:
             table = symtable.symtable(
                 f.read(),
-                doc.get_location().get_basename(),
+                doc_location.get_basename(),
                 "exec",
             )
             for line in self.generateDefLines(table, identifier):
-                yield doc.get_location(), line, ""
+                yield doc_location, line, "", doc_location.get_path()
 
     def generateDefLines(self, table, identifier):
         for c in table.get_children():
