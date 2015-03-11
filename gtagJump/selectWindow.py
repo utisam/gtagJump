@@ -1,26 +1,18 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+import os
 import sys
 from gi.repository import Gtk, Gio, Gdk
 
 
 class TreeViewWithColumn(Gtk.TreeView):
-    # コラム内の項目番号(連番)をrange()で作成する
-    (
-        COLUMN_FILE,
-        COLUMN_LINE,
-        COLUMN_LINE_STR,
-    ) = range(3)    # 実際の値は上から順に0,1,2が入る
-
     def __init__(self, *args, **kwargs):
-        Gtk.TreeView.__init__(self, *args, **kwargs)    # 必須
-        self.col_file = Gtk.TreeViewColumn('File', Gtk.CellRendererText(), text=self.COLUMN_FILE)
-        self.col_line = Gtk.TreeViewColumn('Line', Gtk.CellRendererText(), text=self.COLUMN_LINE)
-        self.col_line_str = Gtk.TreeViewColumn('', Gtk.CellRendererText(), text=self.COLUMN_LINE_STR)
-        self.append_column(self.col_file)
-        self.append_column(self.col_line)
-        self.append_column(self.col_line_str)
+        super().__init__(*args, **kwargs)    # 必須
+        for i, head in enumerate(['File', 'Line', '', '']):
+            col = Gtk.TreeViewColumn(head, Gtk.CellRendererText(), text=i)
+            self.append_column(col)
+        col.set_visible(False)
 
 
 class SelectWindow(Gtk.Window):
@@ -28,7 +20,7 @@ class SelectWindow(Gtk.Window):
         Gtk.Window.__init__(self)
         self.plugin = plugin
         self.treeview = TreeViewWithColumn(
-            model=Gtk.ListStore(str, int, str)
+            model=Gtk.ListStore(str, int, str, str)
         )  # file, line, line_str
         self.treeview.set_rules_hint(True)
         self.connect("key-press-event", self.__enter)
@@ -51,15 +43,12 @@ class SelectWindow(Gtk.Window):
                 and e.keyval == 65293
             )
         ):
-            model, iter = self.treeview.get_selection().get_selected()
-            path, line, line_str = model.get(
-                iter,
-                self.treeview.COLUMN_FILE,
-                self.treeview.COLUMN_LINE,
-                self.treeview.COLUMN_LINE_STR
-            )
+            model, tree_iter = self.treeview.get_selection().get_selected()
+            path, line, doc_path = model.get(tree_iter, 0, 1, 3)
             self.destroy()
-            self.plugin.open_location(Gio.File.new_for_path(path), line)
+            dirname = os.path.dirname(doc_path)
+            newpath = os.path.normpath(os.path.join(dirname, path))
+            self.plugin.open_location(Gio.File.new_for_path(newpath), line)
 
 
 class MockPlugin:
@@ -71,8 +60,8 @@ class MockPlugin:
 
 def main():
     window = SelectWindow(MockPlugin(), "test", [
-        (10, "testfile.py", "def testfunc():"),
-        (10, "testfile.py", "def testfunc():"),
+        (10, "testfile.py", "def testfunc():", "not visible"),
+        (10, "testfile.py", "def testfunc():", "not visible"),
     ])
     window.show_all()
     Gtk.main()

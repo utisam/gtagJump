@@ -87,7 +87,7 @@ class GtagJumpWindowActivatable(GObject.Object, Gedit.WindowActivatable):
         refs = []
         for navi in settings.navigator:
             try:
-                refs += [d for d in navi_method(navi)(doc, identifier)]
+                refs += navi_method(navi)(doc, identifier)
             except TypeError:
                 continue
         self.add_history(self.backstack)
@@ -119,18 +119,17 @@ class GtagJumpWindowActivatable(GObject.Object, Gedit.WindowActivatable):
         """
         locations: [(Gio.File, int)] or [(str, int), ...]
         """
-        if len(locations) != 0:
-            if len(locations) == 1:
-                if isinstance(locations[0][0], Gio.File):
-                    location = locations[0][0]
-                else:
-                    location = Gio.File.new_for_path(locations[0][0])
-                line = locations[0][1]
-                self.open_location(location, line)
-            elif len(locations) > 1:
-                locations.sort()
-                window = selectWindow.SelectWindow(self, identifier, locations)
-                window.show_all()
+        if len(locations) == 1:
+            if isinstance(locations[0][0], Gio.File):
+                location = locations[0][0]
+            else:
+                location = Gio.File.new_for_path(locations[0][0])
+            line = locations[0][1]
+            self.open_location(location, line)
+        elif len(locations) > 1:
+            locations.sort()
+            window = selectWindow.SelectWindow(self, identifier, locations)
+            window.show_all()
 
     def add_history(self, stack):
         doc = self.window.get_active_document()

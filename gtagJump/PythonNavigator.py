@@ -14,14 +14,13 @@ class PythonNavigator:
                 "exec",
             )
             for line in self.generateDefLines(table, identifier):
-                yield (doc.get_location(), line, "")
+                yield doc.get_location(), line, ""
 
     def generateDefLines(self, table, identifier):
         for c in table.get_children():
             if c.get_name() == identifier:
                 yield c.get_lineno()
-            for l in self.generateDefLines(c, identifier):
-                yield l
+            yield from self.generateDefLines(c, identifier)
 
     def getReferences(self, doc, identifier):
         pass
