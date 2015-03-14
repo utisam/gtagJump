@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-import os
 import sys
-from gi.repository import Gtk, Gio, Gdk
+from gi.repository import Gtk, Gdk
 
 
 class TreeViewWithColumn(Gtk.TreeView):
@@ -16,7 +15,7 @@ class TreeViewWithColumn(Gtk.TreeView):
 
 
 class SelectWindow(Gtk.Window):
-    def __init__(self, plugin, windowTitle, recodes):
+    def __init__(self, plugin, windowTitle, records, opener):
         Gtk.Window.__init__(self)
         self.plugin = plugin
         self.treeview = TreeViewWithColumn(
@@ -27,10 +26,11 @@ class SelectWindow(Gtk.Window):
         self.connect("button-press-event", self.__enter)
         sw = Gtk.ScrolledWindow()
         sw.add(self.treeview)
-        for rec in recodes:
+        for rec in records:
             if rec is not None:
                 self.treeview.get_model().append(rec)
         self.add(sw)
+        self.opener = opener
         self.set_title(windowTitle)
         self.set_size_request(700, 360)
 
@@ -44,11 +44,9 @@ class SelectWindow(Gtk.Window):
             )
         ):
             model, tree_iter = self.treeview.get_selection().get_selected()
-            path, line, doc_path = model.get(tree_iter, 0, 1, 3)
+            location = model.get(tree_iter, 0, 1, 2, 3)
             self.destroy()
-            dirname = os.path.dirname(doc_path)
-            newpath = os.path.normpath(os.path.join(dirname, path))
-            self.plugin.open_location(Gio.File.new_for_path(newpath), line)
+            self.opener(location)
 
 
 class MockPlugin:

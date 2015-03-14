@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from gi.repository import GObject, Gedit, Gio
-
 from collections import deque
+import os
+
+from gi.repository import GObject, Gedit, Gio
 
 from gtagJump import selectWindow, settings
 
@@ -119,16 +120,27 @@ class GtagJumpWindowActivatable(GObject.Object, Gedit.WindowActivatable):
         """
         locations: [(Gio.File, int)] or [(str, int), ...]
         """
-        if len(locations) == 1:
-            if isinstance(locations[0][0], Gio.File):
-                location = locations[0][0]
+
+        def location_opener(location):
+            path, line, code, doc_path = location
+            if isinstance(path, Gio.File):
+                gio_file = path
             else:
-                location = Gio.File.new_for_path(locations[0][0])
-            line = locations[0][1]
-            self.open_location(location, line)
+                dirname = os.path.dirname(doc_path)
+                newpath = os.path.normpath(os.path.join(dirname, path))
+                gio_file = Gio.File.new_for_path(newpath)
+            self.open_location(gio_file, line)
+
+        if len(locations) == 1:
+            location_opener(locations[0])
         elif len(locations) > 1:
             locations.sort()
-            window = selectWindow.SelectWindow(self, identifier, locations)
+            window = selectWindow.SelectWindow(
+                self,
+                identifier,
+                locations,
+                location_opener
+            )
             window.show_all()
 
     def add_history(self, stack):
