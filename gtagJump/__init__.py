@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from gi.repository import GObject, Gedit, Gio
-
 from collections import deque
+import os
+
+from gi.repository import GObject, Gedit, Gio
 
 from gtagJump import selectWindow, settings
 
@@ -87,7 +88,7 @@ class GtagJumpWindowActivatable(GObject.Object, Gedit.WindowActivatable):
         refs = []
         for navi in settings.navigator:
             try:
-                refs += [d for d in navi_method(navi)(doc, identifier)]
+                refs += navi_method(navi)(doc, identifier)
             except TypeError:
                 continue
         self.add_history(self.backstack)
@@ -119,18 +120,28 @@ class GtagJumpWindowActivatable(GObject.Object, Gedit.WindowActivatable):
         """
         locations: [(Gio.File, int)] or [(str, int), ...]
         """
-        if len(locations) != 0:
-            if len(locations) == 1:
-                if isinstance(locations[0][0], Gio.File):
-                    location = locations[0][0]
-                else:
-                    location = Gio.File.new_for_path(locations[0][0])
-                line = locations[0][1]
-                self.open_location(location, line)
-            elif len(locations) > 1:
-                locations.sort()
-                window = selectWindow.SelectWindow(self, identifier, locations)
-                window.show_all()
+
+        def location_opener(location):
+            path, line, code, doc_path = location
+            if isinstance(path, Gio.File):
+                gio_file = path
+            else:
+                dirname = os.path.dirname(doc_path)
+                newpath = os.path.normpath(os.path.join(dirname, path))
+                gio_file = Gio.File.new_for_path(newpath)
+            self.open_location(gio_file, line)
+
+        if len(locations) == 1:
+            location_opener(locations[0])
+        elif len(locations) > 1:
+            locations.sort()
+            window = selectWindow.SelectWindow(
+                self,
+                identifier,
+                locations,
+                location_opener
+            )
+            window.show_all()
 
     def add_history(self, stack):
         doc = self.window.get_active_document()
