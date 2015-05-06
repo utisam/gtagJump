@@ -2,43 +2,35 @@
 # -*- coding:utf-8 -*-
 
 import sys
-from gi.repository import Gtk, Gio, Gdk
+from gi.repository import Gtk, Gdk
 
 
 class TreeViewWithColumn(Gtk.TreeView):
-    # コラム内の項目番号(連番)をrange()で作成する
-    (
-        COLUMN_FILE,
-        COLUMN_LINE,
-        COLUMN_LINE_STR,
-    ) = range(3)    # 実際の値は上から順に0,1,2が入る
-
     def __init__(self, *args, **kwargs):
-        Gtk.TreeView.__init__(self, *args, **kwargs)    # 必須
-        self.col_file = Gtk.TreeViewColumn('File', Gtk.CellRendererText(), text=self.COLUMN_FILE)
-        self.col_line = Gtk.TreeViewColumn('Line', Gtk.CellRendererText(), text=self.COLUMN_LINE)
-        self.col_line_str = Gtk.TreeViewColumn('', Gtk.CellRendererText(), text=self.COLUMN_LINE_STR)
-        self.append_column(self.col_file)
-        self.append_column(self.col_line)
-        self.append_column(self.col_line_str)
+        super().__init__(*args, **kwargs)    # 必須
+        for i, head in enumerate(['File', 'Line', '', '']):
+            col = Gtk.TreeViewColumn(head, Gtk.CellRendererText(), text=i)
+            self.append_column(col)
+        col.set_visible(False)
 
 
 class SelectWindow(Gtk.Window):
-    def __init__(self, plugin, windowTitle, recodes):
+    def __init__(self, plugin, windowTitle, records, opener):
         Gtk.Window.__init__(self)
         self.plugin = plugin
         self.treeview = TreeViewWithColumn(
-            model=Gtk.ListStore(str, int, str)
+            model=Gtk.ListStore(str, int, str, str)
         )  # file, line, line_str
         self.treeview.set_rules_hint(True)
         self.connect("key-press-event", self.__enter)
         self.connect("button-press-event", self.__enter)
         sw = Gtk.ScrolledWindow()
         sw.add(self.treeview)
-        for rec in recodes:
+        for rec in records:
             if rec is not None:
                 self.treeview.get_model().append(rec)
         self.add(sw)
+        self.opener = opener
         self.set_title(windowTitle)
         self.set_size_request(700, 360)
 
@@ -51,15 +43,10 @@ class SelectWindow(Gtk.Window):
                 and e.keyval == 65293
             )
         ):
-            model, iter = self.treeview.get_selection().get_selected()
-            path, line, line_str = model.get(
-                iter,
-                self.treeview.COLUMN_FILE,
-                self.treeview.COLUMN_LINE,
-                self.treeview.COLUMN_LINE_STR
-            )
+            model, tree_iter = self.treeview.get_selection().get_selected()
+            location = model.get(tree_iter, 0, 1, 2, 3)
             self.destroy()
-            self.plugin.open_location(Gio.File.new_for_path(path), line)
+            self.opener(location)
 
 
 class MockPlugin:
@@ -71,9 +58,9 @@ class MockPlugin:
 
 def main():
     window = SelectWindow(MockPlugin(), "test", [
-        ("testfile.py", 10, "def testfunc():"),
-        ("testfile.py", 10, "def testfunc():"),
-    ])
+        ("testfile.py", 10, "def testfunc():", "not visible"),
+        ("testfile.py", 10, "def testfunc():", "not visible"),
+        ], lambda _: Gtk.main_quit())
     window.show_all()
     Gtk.main()
     return 0
