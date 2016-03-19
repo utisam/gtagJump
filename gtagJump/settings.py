@@ -2,14 +2,16 @@
 
 from gtagJump.PythonNavigator import PythonNavigator
 from gtagJump.GtagsNavigator import GtagsNavigator
+from gtagJump.EtagsNavigator import EtagsNavigator
 
 navigator = [
     PythonNavigator(),
-    GtagsNavigator()
+    GtagsNavigator(),
+    EtagsNavigator()
 ]
 
 keyJumpDef = "F3"
-keyJumpRef = "<Control>F3"
+keyJumpRef = "F4"
 keyJumpBack = "<Alt>b"
 keyJumpNext = "<Alt>n"
 

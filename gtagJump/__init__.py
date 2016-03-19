@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from collections import deque
+from subprocess import CalledProcessError
 import os
 
 from gi.repository import GObject, Gedit, Gio
@@ -89,7 +90,11 @@ class GtagJumpWindowActivatable(GObject.Object, Gedit.WindowActivatable):
         for navi in settings.navigator:
             try:
                 refs += navi_method(navi)(doc, identifier)
+                if refs:  # break on 1st navigator that works
+                    break
             except TypeError:
+                continue
+            except CalledProcessError:
                 continue
         self.add_history(self.backstack)
         self.jump(refs, identifier)
@@ -162,4 +167,7 @@ class GtagJumpWindowActivatable(GObject.Object, Gedit.WindowActivatable):
                 break
         else:
             # file has not opened yet
-            self.window.create_tab_from_location(location, None, line, 0, False, True)
+            self.window.create_tab_from_location(
+                location, None, line, 0, False, True
+            )
+
