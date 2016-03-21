@@ -9,7 +9,12 @@ def read_etags(path):
     etags = None
     while 1:
         try:
-            etags = open(cur_path + '/TAGS', 'r')
+            etags = open(
+                cur_path + '/TAGS',
+                'r',
+                encoding='ascii',
+                errors='surrogateescape'
+            )
             break
         except FileNotFoundError:
             cur_path, prev_dir = os.path.split(cur_path)
