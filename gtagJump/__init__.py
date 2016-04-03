@@ -126,6 +126,9 @@ class GtagJumpWindowActivatable(GObject.Object, Gedit.WindowActivatable):
         locations: [(Gio.File, int)] or [(str, int), ...]
         """
 
+        if not locations:
+            return
+
         def location_opener(location):
             path, line, code, doc_path = location
             if isinstance(path, Gio.File):
@@ -138,7 +141,7 @@ class GtagJumpWindowActivatable(GObject.Object, Gedit.WindowActivatable):
 
         if len(locations) == 1:
             location_opener(locations[0])
-        elif len(locations) > 1:
+        else:
             locations.sort()
             window = selectWindow.SelectWindow(
                 self,
@@ -170,4 +173,3 @@ class GtagJumpWindowActivatable(GObject.Object, Gedit.WindowActivatable):
             self.window.create_tab_from_location(
                 location, None, line, 0, False, True
             )
-

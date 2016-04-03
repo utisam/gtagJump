@@ -1,13 +1,15 @@
 # -*- coding:utf-8 -*-
 
-from gtagJump.PythonNavigator import PythonNavigator
+from gtagJump.PythonJediNavigator import PythonJediNavigator
 from gtagJump.GtagsNavigator import GtagsNavigator
 from gtagJump.EtagsNavigator import EtagsNavigator
+from gtagJump.PythonSymtableNavigator import PythonSymtableNavigator
 
 navigator = [
-    PythonNavigator(),
+    PythonJediNavigator(),
     GtagsNavigator(),
-    EtagsNavigator()
+    EtagsNavigator(),
+    PythonSymtableNavigator(),
 ]
 
 keyJumpDef = "F3"
@@ -16,4 +18,3 @@ keyJumpBack = "<Alt>b"
 keyJumpNext = "<Alt>n"
 
 historymax = 100
-
