@@ -21,6 +21,8 @@ class PythonJediNavigator:
             path=path
         )
         for definition in getattr(script, method)():
+            if definition.line is None:
+                continue
             yield (
                 definition.module_path,
                 definition.line,

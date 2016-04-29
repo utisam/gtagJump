@@ -162,7 +162,10 @@ class GtagJumpWindowActivatable(GObject.Object, Gedit.WindowActivatable):
 
     def open_location(self, location, line):
         for d in self.window.get_documents():
-            if d.get_location().equal(location):
+            d_location = d.get_location()
+            if not d_location:
+                continue
+            if d_location.equal(location):
                 tab = Gedit.Tab.get_from_document(d)
                 self.window.set_active_tab(tab)
                 d.goto_line(line - 1)
