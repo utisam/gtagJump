@@ -3,7 +3,7 @@
 import symtable
 
 
-class PythonNavigator:
+class PythonSymtableNavigator:
     def getDefinitions(self, doc, identifier):
         if doc.get_language().get_name() != "Python":
             return

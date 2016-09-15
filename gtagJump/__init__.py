@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from collections import deque
+from subprocess import CalledProcessError
 import os
 
 from gi.repository import GObject, Gedit, Gio
@@ -89,7 +90,11 @@ class GtagJumpWindowActivatable(GObject.Object, Gedit.WindowActivatable):
         for navi in settings.navigator:
             try:
                 refs += navi_method(navi)(doc, identifier)
+                if refs:  # break on 1st navigator that works
+                    break
             except TypeError:
+                continue
+            except CalledProcessError:
                 continue
         self.add_history(self.backstack)
         self.jump(refs, identifier)
@@ -121,6 +126,9 @@ class GtagJumpWindowActivatable(GObject.Object, Gedit.WindowActivatable):
         locations: [(Gio.File, int)] or [(str, int), ...]
         """
 
+        if not locations:
+            return
+
         def location_opener(location):
             path, line, code, doc_path = location
             if isinstance(path, Gio.File):
@@ -133,7 +141,7 @@ class GtagJumpWindowActivatable(GObject.Object, Gedit.WindowActivatable):
 
         if len(locations) == 1:
             location_opener(locations[0])
-        elif len(locations) > 1:
+        else:
             locations.sort()
             window = selectWindow.SelectWindow(
                 self,
@@ -154,7 +162,10 @@ class GtagJumpWindowActivatable(GObject.Object, Gedit.WindowActivatable):
 
     def open_location(self, location, line):
         for d in self.window.get_documents():
-            if d.get_location().equal(location):
+            d_location = d.get_location()
+            if not d_location:
+                continue
+            if d_location.equal(location):
                 tab = Gedit.Tab.get_from_document(d)
                 self.window.set_active_tab(tab)
                 d.goto_line(line - 1)
@@ -162,4 +173,6 @@ class GtagJumpWindowActivatable(GObject.Object, Gedit.WindowActivatable):
                 break
         else:
             # file has not opened yet
-            self.window.create_tab_from_location(location, None, line, 0, False, True)
+            self.window.create_tab_from_location(
+                location, None, line, 0, False, True
+            )
